@@ -74,9 +74,7 @@ namespace HoloLensCameraStream
 
         internal bool isBitmapCopied { get; private set; }
 
-        //Private members
-
-        MediaFrameReference frameReference;
+        public MediaFrameReference FrameReference { get; set; }
 
         internal VideoCaptureSample(MediaFrameReference frameReference, SpatialCoordinateSystem worldOrigin)
         {
@@ -85,7 +83,7 @@ namespace HoloLensCameraStream
                 throw new ArgumentNullException("frameReference.");
             }
 
-            this.frameReference = frameReference;
+            this.FrameReference = frameReference;
             this.worldOrigin = worldOrigin;
 
             bitmap = frameReference.VideoMediaFrame.SoftwareBitmap;
@@ -134,7 +132,7 @@ namespace HoloLensCameraStream
         /// See https://forum.unity3d.com/threads/locatable-camera-in-unity.398803/ for details.</param>
         public bool TryGetCameraToWorldMatrix(out float[] outMatrix)
         {
-            if (frameReference.Properties.ContainsKey(viewTransformGuid) == false)
+            if (FrameReference.Properties.ContainsKey(viewTransformGuid) == false)
             {
                 outMatrix = GetIdentityMatrixFloatArray();
                 return false;
@@ -146,14 +144,14 @@ namespace HoloLensCameraStream
                 return false;
             }
             
-            Matrix4x4 cameraViewTransform = ConvertByteArrayToMatrix4x4(frameReference.Properties[viewTransformGuid] as byte[]);
+            Matrix4x4 cameraViewTransform = ConvertByteArrayToMatrix4x4(FrameReference.Properties[viewTransformGuid] as byte[]);
             if (cameraViewTransform == null)
             {
                 outMatrix = GetIdentityMatrixFloatArray();
                 return false;
             }
 
-            SpatialCoordinateSystem cameraCoordinateSystem = frameReference.Properties[cameraCoordinateSystemGuid] as SpatialCoordinateSystem;
+            SpatialCoordinateSystem cameraCoordinateSystem = FrameReference.Properties[cameraCoordinateSystemGuid] as SpatialCoordinateSystem;
             if (cameraCoordinateSystem == null)
             {
                 outMatrix = GetIdentityMatrixFloatArray();
@@ -197,13 +195,13 @@ namespace HoloLensCameraStream
         /// See https://forum.unity3d.com/threads/locatable-camera-in-unity.398803/ for details.</param>
         public bool TryGetProjectionMatrix(out float[] outMatrix)
         {
-            if (frameReference.Properties.ContainsKey(projectionTransformGuid) == false)
+            if (FrameReference.Properties.ContainsKey(projectionTransformGuid) == false)
             {
                 outMatrix = GetIdentityMatrixFloatArray();
                 return false;
             }
 
-            Matrix4x4 projectionMatrix = ConvertByteArrayToMatrix4x4(frameReference.Properties[projectionTransformGuid] as byte[]);
+            Matrix4x4 projectionMatrix = ConvertByteArrayToMatrix4x4(FrameReference.Properties[projectionTransformGuid] as byte[]);
             
             // Transpose matrix to match expected Unity format
             projectionMatrix = Matrix4x4.Transpose(projectionMatrix);
@@ -227,7 +225,7 @@ namespace HoloLensCameraStream
         public void Dispose()
         {
             bitmap.Dispose();
-            frameReference.Dispose();
+            FrameReference.Dispose();
         }
 
         private float[] ConvertMatrixToFloatArray(Matrix4x4 matrix)

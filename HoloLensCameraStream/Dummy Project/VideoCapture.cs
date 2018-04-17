@@ -10,7 +10,7 @@ namespace HoloLensCameraStream
 {
     public delegate void OnVideoCaptureResourceCreatedCallback(VideoCapture captureObject);
 
-    public delegate void OnVideoModeStartedCallback(VideoCaptureResult result);
+    public delegate void OnVideoModeStartedCallback(VideoCaptureResult result, object frameReference);
 
     public delegate void FrameSampleAcquiredCallback(VideoCaptureSample videoCaptureSample);
 
