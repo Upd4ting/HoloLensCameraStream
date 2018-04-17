@@ -68,13 +68,12 @@ namespace HoloLensCameraStream
 
         //Internal members
 
-        internal SpatialCoordinateSystem worldOrigin { get; private set; }
-
         internal SoftwareBitmap bitmap { get; private set; }
 
         internal bool isBitmapCopied { get; private set; }
 
         public MediaFrameReference FrameReference { get; set; }
+        public SpatialCoordinateSystem worldOrigin { get; private set; }
 
         internal VideoCaptureSample(MediaFrameReference frameReference, SpatialCoordinateSystem worldOrigin)
         {
