@@ -45,5 +45,21 @@ namespace HoloLensCameraStream
         {
             throw new NotImplementedException();
         }
+
+        public bool isDepth() {
+            throw new NotImplementedException();
+        }
+
+        public bool isColor() {
+            throw new NotImplementedException();
+        }
+
+        public bool isInfrared() {
+            throw new NotImplementedException();
+        }
+
+        public double getDepthScale() {
+            throw new NotImplementedException();
+        }
     }
 }

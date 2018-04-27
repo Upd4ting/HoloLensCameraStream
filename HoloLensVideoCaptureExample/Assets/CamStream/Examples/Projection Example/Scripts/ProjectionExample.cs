@@ -109,10 +109,10 @@ public class ProjectionExample : MonoBehaviour {
 
         UnityEngine.WSA.Application.InvokeOnAppThread(() => { _pictureTexture = new Texture2D(_resolution.width, _resolution.height, TextureFormat.BGRA32, false); }, false);
 
-        _videoCapture.StartVideoModeAsync(cameraParams, OnVideoModeStarted);
+        _videoCapture.StartVideoModeAsync(false, cameraParams, OnVideoModeStarted);
     }
 
-    private void OnVideoModeStarted(VideoCaptureResult result, object frameReference)
+    private void OnVideoModeStarted(VideoCaptureResult result)
     {
         if(result.success == false)
         {

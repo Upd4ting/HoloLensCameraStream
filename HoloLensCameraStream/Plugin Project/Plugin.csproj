@@ -110,6 +110,7 @@
     <Compile Include="CapturePixelFormat.cs" />
     <Compile Include="CameraParameters.cs" />
     <Compile Include="ResultType.cs" />
+    <Compile Include="SourceKind.cs" />
     <Compile Include="VideoCaptureResult.cs" />
     <Compile Include="Resolution.cs" />
     <Compile Include="VideoCapture.cs" />

@@ -10,7 +10,7 @@ namespace HoloLensCameraStream
 {
     public delegate void OnVideoCaptureResourceCreatedCallback(VideoCapture captureObject);
 
-    public delegate void OnVideoModeStartedCallback(VideoCaptureResult result, object frameReference);
+    public delegate void OnVideoModeStartedCallback(VideoCaptureResult result);
 
     public delegate void FrameSampleAcquiredCallback(VideoCaptureSample videoCaptureSample);
 
@@ -48,7 +48,7 @@ namespace HoloLensCameraStream
             get; set;
         }
 
-        public static void CreateAync(OnVideoCaptureResourceCreatedCallback onCreatedCallback)
+        public static void CreateAync(OnVideoCaptureResourceCreatedCallback onCreatedCallback, SourceKind[] sourceKinds)
         {
             throw new NotImplementedException();
         }
@@ -63,7 +63,7 @@ namespace HoloLensCameraStream
             throw new NotImplementedException();
         }
 
-        public void StartVideoModeAsync(CameraParameters setupParams, OnVideoModeStartedCallback onVideoModeStartedCallback)
+        public void StartVideoModeAsync(bool useRawFormat, CameraParameters setupParams, OnVideoModeStartedCallback onVideoModeStartedCallback)
         {
             throw new NotImplementedException();
         }

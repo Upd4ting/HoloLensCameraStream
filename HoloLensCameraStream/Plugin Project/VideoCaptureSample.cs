@@ -268,6 +268,22 @@ namespace HoloLensCameraStream
                 BitConverter.ToSingle(m, 60));
         }
 
+        public bool isDepth() {
+            return FrameReference.SourceKind == MediaFrameSourceKind.Depth;
+        }
+
+        public bool isColor() {
+            return FrameReference.SourceKind == MediaFrameSourceKind.Color;
+        }
+
+        public bool isInfrared() {
+            return FrameReference.SourceKind == MediaFrameSourceKind.Infrared;
+        }
+
+        public double getDepthScale() {
+            return FrameReference.VideoMediaFrame.DepthMediaFrame.DepthFormat.DepthScaleInMeters;
+        }
+
         static CapturePixelFormat ConvertBitmapPixelFormatToCapturePixelFormat(BitmapPixelFormat format)
         {
             switch (format)
