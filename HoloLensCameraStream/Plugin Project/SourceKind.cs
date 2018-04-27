@@ -8,6 +8,6 @@ namespace HoloLensCameraStream
 {
     public enum SourceKind
     {
-        COLOR, DEPTH, INFRARED
+        COLOR, DEPTH, INFRARED, NOTDEFINED
     }
 }

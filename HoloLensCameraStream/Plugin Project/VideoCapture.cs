@@ -134,13 +134,18 @@ namespace HoloLensCameraStream
             _mediaSourceInfo = mediaSourceInfo;
         }
 
+        public static async void CreateAsync(OnVideoCaptureResourceCreatedCallback onCreatedCallback, SourceKind[] sourceKinds) {
+            CreateAsync(onCreatedCallback, sourceKinds, SourceKind.NOTDEFINED);
+        }
+
         /// <summary>
         /// Asynchronously creates an instance of a VideoCapture object that can be used to stream video frames from the camera to memory.
         /// If the instance failed to be created, the instance returned will be null. Also, holograms will not appear in the video.
         /// </summary>
         /// <param name="onCreatedCallback">This callback will be invoked when the VideoCapture instance is created and ready to be used.</param>
-        /// <param name="frameSourceKinds">Frame source kinds that we want in the MediaFrameSourceGroup</param>
-        public static async void CreateAync(OnVideoCaptureResourceCreatedCallback onCreatedCallback, SourceKind[] sourceKinds)
+        /// <param name="sourceKinds">Frame source kinds that we want in the MediaFrameSourceGroup</param>
+        /// <param name="readerSourceKind">The source kind we want into our reader</param>
+        public static async void CreateAsync(OnVideoCaptureResourceCreatedCallback onCreatedCallback, SourceKind[] sourceKinds, SourceKind readerSourceKind)
         {
             // Convert
             List<MediaFrameSourceKind> list = new List<MediaFrameSourceKind>();
@@ -168,7 +173,18 @@ namespace HoloLensCameraStream
                 }
             }
 
-            var selectedFrameSourceInfo = selectedFrameSourceGroup.SourceInfos.FirstOrDefault();
+            MediaFrameSourceInfo selectedFrameSourceInfo = null;
+
+            if (readerSourceKind == SourceKind.NOTDEFINED)
+                selectedFrameSourceInfo = selectedFrameSourceGroup.SourceInfos.FirstOrDefault();
+            else {
+                foreach (MediaFrameSourceInfo si in selectedFrameSourceGroup.SourceInfos) {
+                    if (si.SourceKind == ConvertSourceKind(readerSourceKind)) {
+                        selectedFrameSourceInfo = si;
+                        break;
+                    }
+                }
+            }
             
             var devices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);   //Returns DeviceCollection
             var deviceInformation = devices.FirstOrDefault();                               //Returns a single DeviceInformation

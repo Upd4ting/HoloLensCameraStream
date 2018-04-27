@@ -53,6 +53,10 @@ namespace HoloLensCameraStream
             throw new NotImplementedException();
         }
 
+        public static void CreateAsync(OnVideoCaptureResourceCreatedCallback onCreatedCallback, SourceKind[] sourceKinds, SourceKind readerSourceKind) {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<Resolution> GetSupportedResolutions()
         {
             throw new NotImplementedException();
