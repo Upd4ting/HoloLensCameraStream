@@ -157,20 +157,25 @@ namespace HoloLensCameraStream
 
             var allFrameSourceGroups = await MediaFrameSourceGroup.FindAllAsync();                                              //Returns IReadOnlyList<MediaFrameSourceGroup>
 
-            var selectedFrameSourceGroup = allFrameSourceGroups.SingleOrDefault(g => frameSourceKinds.All(k => g.SourceInfos.Any(si => si.SourceKind == k)));
+            var selectedFrameSourceGroup = allFrameSourceGroups.FirstOrDefault(g => {
+                foreach (MediaFrameSourceInfo si in g.SourceInfos) {
+                    if (!frameSourceKinds.Contains(si.SourceKind) && (si.SourceKind == MediaFrameSourceKind.Color || 
+                                                                      si.SourceKind == MediaFrameSourceKind.Depth ||
+                                                                      si.SourceKind == MediaFrameSourceKind.Infrared)) {
+                        Debug.WriteLine("Group refused: " + g.DisplayName);
+                        Debug.WriteLine("Containing this that we don't want: " + si.SourceKind);
+                        return false;
+                    }
+                }
+
+                return true;
+            });
             
             if (selectedFrameSourceGroup == null)
             {
+                Debug.WriteLine("Group not found");
                 onCreatedCallback?.Invoke(null);
                 return;
-            }
-
-            // Check that this group contains only our frame source kinds
-            foreach (MediaFrameSourceInfo si in selectedFrameSourceGroup.SourceInfos) {
-                if (!frameSourceKinds.Contains(si.SourceKind)) {
-                    onCreatedCallback?.Invoke(null);
-                    return;
-                }
             }
 
             MediaFrameSourceInfo selectedFrameSourceInfo = null;
@@ -277,19 +282,21 @@ namespace HoloLensCameraStream
             Reader.FrameArrived += HandleFrameArrived;
             await Reader.StartAsync();
 
-            VideoEncodingProperties properties = GetVideoEncodingPropertiesForCameraParams(setupParams);
+            if (!useRawFormat) {
+                VideoEncodingProperties properties = GetVideoEncodingPropertiesForCameraParams(setupParams);
 
-            // Historical context: https://github.com/VulcanTechnologies/HoloLensCameraStream/issues/6
-            if (setupParams.rotateImage180Degrees)
-            {
-                properties.Properties.Add(ROTATION_KEY, 180);
+                // Historical context: https://github.com/VulcanTechnologies/HoloLensCameraStream/issues/6
+                if (setupParams.rotateImage180Degrees)
+                {
+                    properties.Properties.Add(ROTATION_KEY, 180);
+                }
+
+                //	gr: taken from here https://forums.hololens.com/discussion/2009/mixedrealitycapture
+                IVideoEffectDefinition ved = new VideoMRCSettings(setupParams.enableHolograms, setupParams.enableVideoStabilization, setupParams.videoStabilizationBufferSize, setupParams.hologramOpacity);
+                await _mediaCapture.AddVideoEffectAsync(ved, MediaStreamType.VideoPreview);
+
+                await _mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(STREAM_TYPE, properties);
             }
-
-            //	gr: taken from here https://forums.hololens.com/discussion/2009/mixedrealitycapture
-            IVideoEffectDefinition ved = new VideoMRCSettings(setupParams.enableHolograms, setupParams.enableVideoStabilization, setupParams.videoStabilizationBufferSize, setupParams.hologramOpacity);
-            await _mediaCapture.AddVideoEffectAsync(ved, MediaStreamType.VideoPreview);
-
-            await _mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(STREAM_TYPE, properties);
 
             onVideoModeStartedCallback?.Invoke(new VideoCaptureResult(0, ResultType.Success, true));
         }
@@ -318,10 +325,8 @@ namespace HoloLensCameraStream
             }
 
             TypedEventHandler<MediaFrameReader, MediaFrameArrivedEventArgs> handler = null;
-            handler = (MediaFrameReader sender, MediaFrameArrivedEventArgs args) =>
-            {
-                using (var frameReference = Reader.TryAcquireLatestFrame()) //frame: MediaFrameReference
-                {
+            handler = (MediaFrameReader sender, MediaFrameArrivedEventArgs args) => {
+                using (MediaFrameReference frameReference = sender.TryAcquireLatestFrame()) {
                     if (frameReference != null)
                     {
                         onFrameSampleAcquired.Invoke(new VideoCaptureSample(frameReference, worldOrigin));
@@ -396,8 +401,7 @@ namespace HoloLensCameraStream
                 return;
             }
 
-            using (var frameReference = sender.TryAcquireLatestFrame()) //frameReference is a MediaFrameReference
-            {
+            using (MediaFrameReference frameReference = sender.TryAcquireLatestFrame()) {
                 if (frameReference != null)
                 {
                     var sample = new VideoCaptureSample(frameReference, worldOrigin);
