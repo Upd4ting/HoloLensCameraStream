@@ -90,7 +90,7 @@ public class CameraStreamHelper : MonoBehaviour
         }
 
         instance = this;
-        VideoCapture.CreateAync(OnVideoCaptureInstanceCreated, new SourceKind[] {SourceKind.COLOR});
+        VideoCapture.CreateAsync(OnVideoCaptureInstanceCreated, new SourceKind[] {SourceKind.COLOR});
     }
 
     private void OnDestroy()
