@@ -10,4 +10,3 @@ namespace HoloLensCameraStream
         COLOR, DEPTH, INFRARED, NOTDEFINED
     }
 }
-
